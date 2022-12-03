@@ -5,10 +5,12 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.confety.mail.dto.Body;
 import com.confety.mail.entity.Templates;
 import com.confety.mail.repository.TemplateRepository;
 
@@ -32,14 +34,14 @@ public class TemplateService {
 				template.setDescription(description);
 				template.setName(title);
 				template.setVars(vars.toString());
-				templateRepository.save(template);
-				
+				templateRepository.save(template);	
+				return new ResponseEntity<Body>(new Body("La template fue creada exitosamente con Id --> " + template.getId()) , HttpStatus.OK);
+			}else {
+				return new ResponseEntity<Body>(new Body("Error al procesar el archivo, solo se admiten html con contenido.") , HttpStatus.NOT_ACCEPTABLE);
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			return new ResponseEntity<Body>(new Body(e.getMessage()) , HttpStatus.INTERNAL_SERVER_ERROR);
 		}	
-	return ResponseEntity.ok("ok");	
 	}
 	
 	private Boolean validateContentType(MultipartFile templateFile) throws IOException {
